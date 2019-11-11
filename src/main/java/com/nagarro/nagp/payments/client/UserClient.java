@@ -26,7 +26,7 @@ public interface UserClient {
 	 *            the id
 	 * @return the user
 	 */
-	@GetMapping(value = "/user/{id}")
+	@GetMapping(value = "/user-service/user/{id}")
 	public UserDTO getUser(@PathVariable("id") final long id);
 
 	/**
@@ -36,7 +36,7 @@ public interface UserClient {
 	 *            the id
 	 * @return the user
 	 */
-	@GetMapping(value = "/user")
+	@GetMapping(value = "/user-service/user")
 	public List<UserDTO> getAllUser();
 
 	/**
@@ -46,7 +46,7 @@ public interface UserClient {
 	 *            the id
 	 * @return the user
 	 */
-	@GetMapping(value = "/user/{id}/accounts")
+	@GetMapping(value = "/user-service/user/{id}/accounts")
 	public List<AccountDTO> getUserAccounts(@PathVariable("id") final long id);
 
 	/**
@@ -58,7 +58,7 @@ public interface UserClient {
 	 *            the request
 	 * @return the account DTO
 	 */
-	@PutMapping(value = "/accounts/{accountNumber}")
+	@PutMapping(value = "/user-service/accounts/{accountNumber}")
 	public AccountDTO updateAccountDetails(@PathVariable("accountNumber") final String accountNumber,
 			@RequestBody UpdateAccountRequest request);
 
@@ -69,7 +69,7 @@ public interface UserClient {
 	 *            the account number
 	 * @return the account
 	 */
-	@GetMapping(value = "/accounts/{accountNumber}")
+	@GetMapping(value = "/user-service/accounts/{accountNumber}")
 	public AccountDTO getAccount(@PathVariable("accountNumber") final String accountNumber);
 
 }

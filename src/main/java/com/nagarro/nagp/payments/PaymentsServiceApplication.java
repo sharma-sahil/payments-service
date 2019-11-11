@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients("com.nagarro.nagp")
 public class PaymentsServiceApplication {
 
 	public static void main(String[] args) {

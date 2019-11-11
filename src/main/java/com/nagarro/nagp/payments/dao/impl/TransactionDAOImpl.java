@@ -1,6 +1,7 @@
 package com.nagarro.nagp.payments.dao.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ import com.nagarro.nagp.payments.model.Transaction;
 @Component
 public class TransactionDAOImpl implements ITransactionDAO {
 	
-	private static List<Transaction> transactions;
+	private static List<Transaction> transactions = new ArrayList<>();
 
 	@Override
 	public void recordTransaction(Transaction transaction) {
