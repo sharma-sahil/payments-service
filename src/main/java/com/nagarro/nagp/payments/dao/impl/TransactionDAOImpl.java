@@ -33,7 +33,7 @@ public class TransactionDAOImpl implements ITransactionDAO {
 	
 	private long getNewTransactionId() {
 		long paymentID = 1L;
-		if (null != transactions && transactions.size() > 1) {
+		if (null != transactions && transactions.size() > 0) {
 			paymentID = transactions.get(transactions.size() - 1).getTransactionId() + 1;
 		}
 

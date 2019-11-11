@@ -29,9 +29,8 @@ public class PaymentsServiceImpl implements IPaymentsService {
 	@Override
 	public void recordTransaction(PaymentRequest request) {
 
-		AccountDTO account = this.userClient.getAccount(request.getSourceAccount());
-		UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest();
-		long oldBalance = account.getBalance();
+		AccountDTO sourceAccount = this.userClient.getAccount(request.getSourceAccount());
+		long oldBalance = sourceAccount.getBalance();
 		long newBalance = 0L;
 
 		Transaction transaction = new Transaction();
@@ -39,6 +38,8 @@ public class PaymentsServiceImpl implements IPaymentsService {
 		transaction.setTransactionAmount(request.getTransactionAmount());
 		transaction.setOldBalance(oldBalance);
 		transaction.setAction(request.getAction());
+
+		boolean updateDestinationAccount = false;
 
 		switch (request.getAction()) {
 		case DEPOSIT:
@@ -50,15 +51,23 @@ public class PaymentsServiceImpl implements IPaymentsService {
 		case TRANSFER:
 			transaction.setDestinationAccount(request.getDestinationAccount());
 			newBalance = oldBalance - request.getTransactionAmount();
+			updateDestinationAccount = true;
 			break;
 		default:
 			// DO nothing
 		}
 
 		this.transactionDAO.recordTransaction(transaction);
-		updateAccountRequest.setBalance(newBalance);
-		updateAccountRequest.setAction(UpdateAccountAction.UPDATE_BALANCE);
-		this.userClient.updateAccountDetails(request.getSourceAccount(), updateAccountRequest);
+
+		// update account balance of source account
+		updateAccountBalance(request.getSourceAccount(), newBalance);
+
+		// update account balance of destination account
+		if (updateDestinationAccount) {
+			AccountDTO destinationAccount = this.userClient.getAccount(request.getSourceAccount());
+			this.updateAccountBalance(request.getDestinationAccount(),
+					destinationAccount.getBalance() + request.getTransactionAmount());
+		}
 
 	}
 
@@ -74,6 +83,28 @@ public class PaymentsServiceImpl implements IPaymentsService {
 		return response;
 	}
 
+	/**
+	 * Update account balance.
+	 *
+	 * @param accountNumber
+	 *            the account number
+	 * @param newBalance
+	 *            the new balance
+	 */
+	private void updateAccountBalance(final String accountNumber, final long newBalance) {
+		UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest();
+		updateAccountRequest.setBalance(newBalance);
+		updateAccountRequest.setAction(UpdateAccountAction.UPDATE_BALANCE);
+		this.userClient.updateAccountDetails(accountNumber, updateAccountRequest);
+	}
+
+	/**
+	 * Transform transaction to DTO.
+	 *
+	 * @param transaction
+	 *            the transaction
+	 * @return the payment DTO
+	 */
 	private PaymentDTO transformTransactionToDTO(final Transaction transaction) {
 		PaymentDTO retVal = new PaymentDTO();
 		retVal.setAction(transaction.getAction());
@@ -89,7 +120,7 @@ public class PaymentsServiceImpl implements IPaymentsService {
 			break;
 		case TRANSFER:
 		case WITHDRAW:
-			retVal.setNewBalance(transaction.getOldBalance() + transaction.getTransactionAmount());
+			retVal.setNewBalance(transaction.getOldBalance() - transaction.getTransactionAmount());
 			break;
 		default:
 			break;
