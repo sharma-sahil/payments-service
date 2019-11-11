@@ -12,6 +12,7 @@ import com.nagarro.nagp.payments.dto.PaymentDTO;
 import com.nagarro.nagp.payments.dto.PaymentRequest;
 import com.nagarro.nagp.payments.dto.user.AccountDTO;
 import com.nagarro.nagp.payments.dto.user.UpdateAccountRequest;
+import com.nagarro.nagp.payments.enums.user.UpdateAccountAction;
 import com.nagarro.nagp.payments.model.Transaction;
 import com.nagarro.nagp.payments.service.IPaymentsService;
 
@@ -56,6 +57,7 @@ public class PaymentsServiceImpl implements IPaymentsService {
 
 		this.transactionDAO.recordTransaction(transaction);
 		updateAccountRequest.setBalance(newBalance);
+		updateAccountRequest.setAction(UpdateAccountAction.UPDATE_BALANCE);
 		this.userClient.updateAccountDetails(request.getSourceAccount(), updateAccountRequest);
 
 	}
