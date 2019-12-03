@@ -31,7 +31,7 @@ public class InputValidator {
 			throw new InvalidParameterException("Request Action must not be null", "invalid.request.action");
 		}
 
-		if (StringUtils.hasText(request.getSourceAccount())) {
+		if (!StringUtils.hasText(request.getSourceAccount())) {
 			throw new InvalidParameterException("Source Account number must not be null",
 					"invalid.request.sourceAccount");
 		}
@@ -42,7 +42,7 @@ public class InputValidator {
 		}
 
 		if (request.getAction().equals(PaymentAction.TRANSFER)
-				&& StringUtils.hasText(request.getDestinationAccount())) {
+				&& !StringUtils.hasText(request.getDestinationAccount())) {
 			throw new InvalidParameterException(
 					"Detination Account number must not be null for Request Action = TRANSFER",
 					"invalid.request.deatinationAccount");
