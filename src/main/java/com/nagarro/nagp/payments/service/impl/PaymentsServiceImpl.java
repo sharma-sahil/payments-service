@@ -3,6 +3,8 @@ package com.nagarro.nagp.payments.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import com.nagarro.nagp.payments.service.IPaymentsService;
 @Service
 public class PaymentsServiceImpl implements IPaymentsService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentsServiceImpl.class);
+
 	@Autowired
 	private ITransactionDAO transactionDAO;
 
@@ -28,6 +32,9 @@ public class PaymentsServiceImpl implements IPaymentsService {
 
 	@Override
 	public void recordTransaction(PaymentRequest request) {
+
+		LOGGER.debug("Adding a new transaction for the account :{} with operation : {}, of amount: {}",
+				request.getSourceAccount(), request.getAction(), request.getTransactionAmount());
 
 		AccountDTO sourceAccount = this.userClient.getAccount(request.getSourceAccount());
 		long oldBalance = sourceAccount.getBalance();
@@ -64,6 +71,8 @@ public class PaymentsServiceImpl implements IPaymentsService {
 
 		// update account balance of destination account
 		if (updateDestinationAccount) {
+			LOGGER.debug("Updating the balance of destination account:{} after fund transfer of balance: {}",
+					request.getSourceAccount(), request.getTransactionAmount());
 			AccountDTO destinationAccount = this.userClient.getAccount(request.getSourceAccount());
 			this.updateAccountBalance(request.getDestinationAccount(),
 					destinationAccount.getBalance() + request.getTransactionAmount());
@@ -92,6 +101,7 @@ public class PaymentsServiceImpl implements IPaymentsService {
 	 *            the new balance
 	 */
 	private void updateAccountBalance(final String accountNumber, final long newBalance) {
+		LOGGER.debug("Updating account balance of {} to {}", accountNumber, newBalance);
 		UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest();
 		updateAccountRequest.setBalance(newBalance);
 		updateAccountRequest.setAction(UpdateAccountAction.UPDATE_BALANCE);
