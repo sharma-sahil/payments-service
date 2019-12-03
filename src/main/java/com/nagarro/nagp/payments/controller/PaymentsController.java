@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nagarro.nagp.payments.dto.PaymentDTO;
 import com.nagarro.nagp.payments.dto.PaymentRequest;
 import com.nagarro.nagp.payments.exception.InvalidParameterException;
+import com.nagarro.nagp.payments.exception.TransactionException;
 import com.nagarro.nagp.payments.service.IPaymentsService;
 import com.nagarro.nagp.payments.validator.InputValidator;
 
@@ -30,9 +31,11 @@ public class PaymentsController {
 	 * @param request
 	 *            the request
 	 * @throws InvalidParameterException
+	 * @throws TransactionException
 	 */
 	@PostMapping(value = "/payments")
-	public void recordTransaction(@RequestBody PaymentRequest request) throws InvalidParameterException {
+	public void recordTransaction(@RequestBody PaymentRequest request)
+			throws InvalidParameterException, TransactionException {
 		InputValidator.validateRequest(request);
 		this.paymentsService.recordTransaction(request);
 	}

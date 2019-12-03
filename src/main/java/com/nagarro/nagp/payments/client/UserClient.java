@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.nagarro.nagp.payments.dto.user.AccountDTO;
 import com.nagarro.nagp.payments.dto.user.UpdateAccountRequest;
 import com.nagarro.nagp.payments.dto.user.UserDTO;
+import com.nagarro.nagp.payments.exception.InvalidParameterException;
 
 @Component
 @RibbonClient(name = "user-service")
@@ -52,15 +53,14 @@ public interface UserClient {
 	/**
 	 * Update account details.
 	 *
-	 * @param accountNumber
-	 *            the account number
-	 * @param request
-	 *            the request
+	 * @param accountNumber            the account number
+	 * @param request            the request
 	 * @return the account DTO
+	 * @throws InvalidParameterException the invalid parameter exception
 	 */
 	@PutMapping(value = "/user-service/accounts/{accountNumber}")
 	public AccountDTO updateAccountDetails(@PathVariable("accountNumber") final String accountNumber,
-			@RequestBody UpdateAccountRequest request);
+			@RequestBody UpdateAccountRequest request) throws InvalidParameterException;
 
 	/**
 	 * Gets the account.

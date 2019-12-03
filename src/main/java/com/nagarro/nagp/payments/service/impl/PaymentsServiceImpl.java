@@ -15,6 +15,8 @@ import com.nagarro.nagp.payments.dto.PaymentRequest;
 import com.nagarro.nagp.payments.dto.user.AccountDTO;
 import com.nagarro.nagp.payments.dto.user.UpdateAccountRequest;
 import com.nagarro.nagp.payments.enums.user.UpdateAccountAction;
+import com.nagarro.nagp.payments.exception.InvalidParameterException;
+import com.nagarro.nagp.payments.exception.TransactionException;
 import com.nagarro.nagp.payments.model.Transaction;
 import com.nagarro.nagp.payments.service.IPaymentsService;
 
@@ -31,7 +33,7 @@ public class PaymentsServiceImpl implements IPaymentsService {
 	private UserClient userClient;
 
 	@Override
-	public void recordTransaction(PaymentRequest request) {
+	public void recordTransaction(PaymentRequest request) throws TransactionException {
 
 		LOGGER.debug("Adding a new transaction for the account :{} with operation : {}, of amount: {}",
 				request.getSourceAccount(), request.getAction(), request.getTransactionAmount());
@@ -64,19 +66,32 @@ public class PaymentsServiceImpl implements IPaymentsService {
 			// DO nothing
 		}
 
-		this.transactionDAO.recordTransaction(transaction);
-
 		// update account balance of source account
-		updateAccountBalance(request.getSourceAccount(), newBalance);
+		try {
+			this.updateAccountBalance(request.getSourceAccount(), newBalance);
+		} catch (InvalidParameterException e) {
+			LOGGER.error("Exception : {} while updating the account balance of Acc : {}", e.getMessage(),
+					request.getSourceAccount());
+			throw new TransactionException(e.getMessage(), e, e.getErrorCode());
+		}
 
 		// update account balance of destination account
 		if (updateDestinationAccount) {
 			LOGGER.debug("Updating the balance of destination account:{} after fund transfer of balance: {}",
 					request.getSourceAccount(), request.getTransactionAmount());
 			AccountDTO destinationAccount = this.userClient.getAccount(request.getSourceAccount());
-			this.updateAccountBalance(request.getDestinationAccount(),
-					destinationAccount.getBalance() + request.getTransactionAmount());
+			try {
+				this.updateAccountBalance(request.getDestinationAccount(),
+						destinationAccount.getBalance() + request.getTransactionAmount());
+			} catch (InvalidParameterException e) {
+				LOGGER.error("Exception : {} while updating the account balance of account : {}", e.getMessage(),
+						request.getDestinationAccount());
+				throw new TransactionException(e.getMessage(), e, e.getErrorCode());
+			}
+
 		}
+
+		this.transactionDAO.recordTransaction(transaction);
 
 	}
 
@@ -99,8 +114,11 @@ public class PaymentsServiceImpl implements IPaymentsService {
 	 *            the account number
 	 * @param newBalance
 	 *            the new balance
+	 * @throws InvalidParameterException
+	 *             the invalid parameter exception
 	 */
-	private void updateAccountBalance(final String accountNumber, final long newBalance) {
+	private void updateAccountBalance(final String accountNumber, final long newBalance)
+			throws InvalidParameterException {
 		LOGGER.debug("Updating account balance of {} to {}", accountNumber, newBalance);
 		UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest();
 		updateAccountRequest.setBalance(newBalance);
