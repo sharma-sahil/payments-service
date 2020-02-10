@@ -27,7 +27,7 @@ public interface UserClient {
 	 *            the id
 	 * @return the user
 	 */
-	@GetMapping(value = "/user-service/user/{id}")
+	@GetMapping(value = "/user/{id}")
 	public UserDTO getUser(@PathVariable("id") final long id);
 
 	/**
@@ -37,7 +37,7 @@ public interface UserClient {
 	 *            the id
 	 * @return the user
 	 */
-	@GetMapping(value = "/user-service/user")
+	@GetMapping(value = "/user")
 	public List<UserDTO> getAllUser();
 
 	/**
@@ -47,7 +47,7 @@ public interface UserClient {
 	 *            the id
 	 * @return the user
 	 */
-	@GetMapping(value = "/user-service/user/{id}/accounts")
+	@GetMapping(value = "/user/{id}/accounts")
 	public List<AccountDTO> getUserAccounts(@PathVariable("id") final long id);
 
 	/**
@@ -58,7 +58,7 @@ public interface UserClient {
 	 * @return the account DTO
 	 * @throws InvalidParameterException the invalid parameter exception
 	 */
-	@PutMapping(value = "/user-service/accounts/{accountNumber}")
+	@PutMapping(value = "/accounts/{accountNumber}")
 	public AccountDTO updateAccountDetails(@PathVariable("accountNumber") final String accountNumber,
 			@RequestBody UpdateAccountRequest request) throws InvalidParameterException;
 
@@ -69,7 +69,7 @@ public interface UserClient {
 	 *            the account number
 	 * @return the account
 	 */
-	@GetMapping(value = "/user-service/accounts/{accountNumber}")
+	@GetMapping(value = "/accounts/{accountNumber}")
 	public AccountDTO getAccount(@PathVariable("accountNumber") final String accountNumber);
 
 }
